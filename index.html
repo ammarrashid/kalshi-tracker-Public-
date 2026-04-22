@@ -23,8 +23,47 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none}
-body{padding:calc(var(--sat) + 20px) 16px calc(var(--sab) + 44px)}
+
+/* ── LOGIN PAGE ── */
+#login-page {
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;z-index:1000;
+}
+#login-page.hidden{display:none}
+
+.login-box{width:100%;max-width:340px}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .ltag{display:inline-block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,229,160,.3);padding:3px 12px;margin-bottom:12px;border-radius:3px}
+.login-logo h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;color:#fff}
+.login-logo h1 span{color:var(--green)}
+.login-logo p{font-size:10px;color:var(--sub);margin-top:5px;letter-spacing:1px}
+
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.login-field input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:15px;padding:12px 14px;border-radius:10px;outline:none;-webkit-appearance:none;transition:border-color .2s}
+.login-field input:focus{border-color:var(--green)}
+
+.login-btn{width:100%;background:var(--green);color:#000;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;padding:13px;border:none;border-radius:10px;cursor:pointer;margin-top:6px;-webkit-user-select:none;user-select:none;transition:opacity .15s}
+.login-btn:active{opacity:.8}
+
+.login-err{background:var(--red-dim);border:1px solid rgba(255,95,109,.25);color:var(--red);font-size:11px;padding:10px 14px;border-radius:8px;margin-top:12px;text-align:center;display:none}
+.login-err.show{display:block}
+
+.view-only-btn{width:100%;background:transparent;border:1px solid var(--border);color:var(--sub);font-family:'DM Mono',monospace;font-size:11px;padding:11px;border-radius:10px;cursor:pointer;margin-top:10px;-webkit-user-select:none;user-select:none}
+.view-only-btn:active{background:var(--surface)}
+
+.login-note{text-align:center;font-size:9px;color:var(--muted);margin-top:20px;letter-spacing:1px}
+
+/* ── MAIN APP ── */
+#app{display:none}
+#app.show{display:block}
+body.app-ready{padding:calc(var(--sat) + 20px) 16px calc(var(--sab) + 44px)}
 body::before{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,160,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* View-only banner */
+#vo-banner{background:var(--yellow-dim);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:9px 14px;margin-bottom:14px;font-size:10px;color:var(--yellow);text-align:center;letter-spacing:1px;display:none}
+#vo-banner.show{display:block}
 
 /* Loading */
 #lo{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;transition:opacity .4s}
@@ -40,16 +79,19 @@ body::before{content:'';position:fixed;top:-200px;left:-200px;width:600px;height
 #toast.err{border-color:rgba(255,95,109,.4);color:var(--red)}
 
 /* Header */
-header{text-align:center;margin-bottom:20px;animation:fd .5s ease both}
+header{text-align:center;margin-bottom:18px;animation:fd .5s ease both}
 .ltag{display:inline-block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,229,160,.3);padding:3px 12px;margin-bottom:10px;border-radius:3px}
 h1{font-family:'Syne',sans-serif;font-size:clamp(22px,7vw,34px);font-weight:800;letter-spacing:-1px;color:#fff}
 h1 span{color:var(--green)}
 .hsub{font-size:10px;color:var(--sub);margin-top:4px;letter-spacing:1px}
 
-/* Sync */
-.sync{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase}
+/* Sync + logout row */
+.toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sync{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--sub);letter-spacing:1px;text-transform:uppercase}
 .sdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{font-size:9px;color:var(--sub);background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:1px}
+.logout-btn:active{background:var(--surface)}
 
 /* Tabs */
 .tabs{display:flex;gap:8px;margin-bottom:16px}
@@ -94,13 +136,14 @@ h1 span{color:var(--green)}
 .li{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--sub)}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-/* Log section */
+/* Log */
 .log{animation:fu .5s .2s ease both}
 .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .stitle{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--sub)}
 .ftag{font-size:9px;color:var(--green);cursor:pointer;padding:3px 8px;border:1px solid rgba(0,229,160,.2);border-radius:99px;display:none;margin-left:8px}
 .abtn{background:var(--green-dim);border:1px solid rgba(0,229,160,.25);color:var(--green);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:7px 14px;border-radius:8px;cursor:pointer;-webkit-user-select:none;user-select:none}
 .abtn:active{background:rgba(0,229,160,.2);transform:scale(.97)}
+.abtn:disabled{opacity:.3;cursor:not-allowed}
 
 /* Form */
 .form{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;display:none}
@@ -138,10 +181,11 @@ h1 span{color:var(--green)}
 .sslider{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:3px;display:flex}
 .sslider-thumb{position:absolute;top:3px;height:calc(100% - 6px);border-radius:99px;transition:left .25s cubic-bezier(.4,0,.2,1),width .25s,background .25s;pointer-events:none;z-index:1}
 .sslider-opts{display:flex;width:100%;position:relative;z-index:2}
-.sopt{flex:1;text-align:center;font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:7px 2px;border-radius:99px;cursor:pointer;color:var(--sub);-webkit-user-select:none;user-select:none;transition:color .2s;z-index:2}
+.sopt{flex:1;text-align:center;font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:7px 2px;border-radius:99px;color:var(--sub);-webkit-user-select:none;user-select:none;transition:color .2s;z-index:2}
 .sopt.act-paid{color:#000;font-weight:500}
 .sopt.act-pending{color:#000;font-weight:500}
 .sopt.act-uninvoiced{color:#fff;font-weight:500}
+.sslider.locked .sopt{cursor:default;pointer-events:none}
 
 .empty{text-align:center;padding:36px 16px;color:var(--muted);font-size:11px;letter-spacing:1px}
 .fnote{text-align:center;font-size:9px;color:var(--muted);margin-top:28px;letter-spacing:1px}
@@ -152,117 +196,210 @@ h1 span{color:var(--green)}
 </head>
 <body>
 
-<div id="lo"><div class="spin"></div><div class="ltext">Loading...</div></div>
-<div id="toast"></div>
-
-<header>
-  <div class="ltag">Kalshi · Dual Account</div>
-  <h1>Promo <span>Tracker</span></h1>
-  <div class="hsub">@maira4yo $50 &nbsp;·&nbsp; @stfnigg $40 &nbsp;·&nbsp; iOS ready</div>
-</header>
-
-<div class="sync"><div class="sdot"></div><span id="slbl">synced</span></div>
-
-<div class="tabs">
-  <div class="tab on" id="tab-all"     onclick="setAcct('all')">    <b>All</b>       <small>combined</small></div>
-  <div class="tab"    id="tab-maira"   onclick="setAcct('maira')">  <b>@maira4yo</b><small>$50/quote</small></div>
-  <div class="tab"    id="tab-stfnigg" onclick="setAcct('stfnigg')"><b>@stfnigg</b>  <small>$40/quote</small></div>
-</div>
-
-<div class="banner">
-  <div>
-    <div class="bl-lbl">Total Earned</div>
-    <div class="bl-amt"  id="b-earned">—</div>
-    <div class="bl-note" id="b-note">—</div>
-  </div>
-  <div class="br">
-    <div class="br-lbl">Still Owed</div>
-    <div class="br-amt" id="b-owed">—</div>
-  </div>
-</div>
-
-<div class="cards">
-  <div class="card ct" onclick="setFilter('all')">
-    <div class="clbl">Total Posted</div>
-    <div class="cnum" id="c-total">—</div>
-    <div class="cmoney"><strong id="a-total">—</strong> value</div>
-  </div>
-  <div class="card cp" onclick="setFilter('paid')">
-    <div class="clbl">Paid</div>
-    <div class="cnum" id="c-paid">—</div>
-    <div class="cmoney"><strong id="a-paid">—</strong> received</div>
-  </div>
-  <div class="card cn" onclick="setFilter('pending')">
-    <div class="clbl">Invoice Pending</div>
-    <div class="cnum" id="c-pend">—</div>
-    <div class="cmoney"><strong id="a-pend">—</strong> awaiting</div>
-  </div>
-  <div class="card cu" onclick="setFilter('uninvoiced')">
-    <div class="clbl">Not Invoiced</div>
-    <div class="cnum" id="c-uninv">—</div>
-    <div class="cmoney"><strong id="a-uninv">—</strong> to invoice</div>
-  </div>
-</div>
-
-<div class="prog">
-  <div class="plbl"><span>Payment Breakdown</span><span id="pct">0% paid</span></div>
-  <div class="pbar">
-    <div class="seg sp" id="seg-p" style="width:0%"></div>
-    <div class="seg sn" id="seg-n" style="width:0%"></div>
-    <div class="seg su" id="seg-u" style="width:0%"></div>
-  </div>
-  <div class="legend">
-    <div class="li"><div class="dot" style="background:var(--green)"></div>Paid</div>
-    <div class="li"><div class="dot" style="background:var(--yellow)"></div>Inv. Pending</div>
-    <div class="li"><div class="dot" style="background:var(--red)"></div>Not Invoiced</div>
-  </div>
-</div>
-
-<div class="log">
-  <div class="sh">
-    <div style="display:flex;align-items:center">
-      <div class="stitle">Quote Log</div>
-      <div class="ftag" id="ftag" onclick="setFilter('all')">all</div>
+<!-- ── LOGIN PAGE ── -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="ltag">Kalshi · Private</div>
+      <h1>Promo <span>Tracker</span></h1>
+      <p>@maira4yo &nbsp;·&nbsp; @stfnigg</p>
     </div>
-    <button class="abtn" onclick="toggleForm()">+ Add Entry</button>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="l-user" autocomplete="username" autocorrect="off" autocapitalize="none" placeholder="username">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div class="login-err" id="login-err">Incorrect username or password</div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="view-only-btn" onclick="enterViewOnly()">View only (no editing)</button>
+    <div class="login-note">your data · your device · private</div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="app">
+  <div id="lo"><div class="spin"></div><div class="ltext">Loading...</div></div>
+  <div id="toast"></div>
+
+  <header>
+    <div class="ltag">Kalshi · Dual Account</div>
+    <h1>Promo <span>Tracker</span></h1>
+    <div class="hsub">@maira4yo $50 &nbsp;·&nbsp; @stfnigg $40</div>
+  </header>
+
+  <div id="vo-banner" class="vo-banner">👁 View only — sign in to edit</div>
+
+  <div class="toprow">
+    <div class="sync"><div class="sdot"></div><span id="slbl">synced</span></div>
+    <button class="logout-btn" onclick="doLogout()">sign out</button>
   </div>
 
-  <div class="form" id="aform">
-    <div class="frow">
-      <div class="fg"><label>Account</label>
-        <select id="f-acct">
-          <option value="maira">@maira4yo ($50)</option>
-          <option value="stfnigg">@stfnigg ($40)</option>
-        </select>
+  <div class="tabs">
+    <div class="tab on" id="tab-all"     onclick="setAcct('all')">    <b>All</b>       <small>combined</small></div>
+    <div class="tab"    id="tab-maira"   onclick="setAcct('maira')">  <b>@maira4yo</b><small>$50/quote</small></div>
+    <div class="tab"    id="tab-stfnigg" onclick="setAcct('stfnigg')"><b>@stfnigg</b>  <small>$40/quote</small></div>
+  </div>
+
+  <div class="banner">
+    <div>
+      <div class="bl-lbl">Total Earned</div>
+      <div class="bl-amt"  id="b-earned">—</div>
+      <div class="bl-note" id="b-note">—</div>
+    </div>
+    <div class="br">
+      <div class="br-lbl">Still Owed</div>
+      <div class="br-amt" id="b-owed">—</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card ct" onclick="setFilter('all')">
+      <div class="clbl">Total Posted</div>
+      <div class="cnum" id="c-total">—</div>
+      <div class="cmoney"><strong id="a-total">—</strong> value</div>
+    </div>
+    <div class="card cp" onclick="setFilter('paid')">
+      <div class="clbl">Paid</div>
+      <div class="cnum" id="c-paid">—</div>
+      <div class="cmoney"><strong id="a-paid">—</strong> received</div>
+    </div>
+    <div class="card cn" onclick="setFilter('pending')">
+      <div class="clbl">Invoice Pending</div>
+      <div class="cnum" id="c-pend">—</div>
+      <div class="cmoney"><strong id="a-pend">—</strong> awaiting</div>
+    </div>
+    <div class="card cu" onclick="setFilter('uninvoiced')">
+      <div class="clbl">Not Invoiced</div>
+      <div class="cnum" id="c-uninv">—</div>
+      <div class="cmoney"><strong id="a-uninv">—</strong> to invoice</div>
+    </div>
+  </div>
+
+  <div class="prog">
+    <div class="plbl"><span>Payment Breakdown</span><span id="pct">0% paid</span></div>
+    <div class="pbar">
+      <div class="seg sp" id="seg-p" style="width:0%"></div>
+      <div class="seg sn" id="seg-n" style="width:0%"></div>
+      <div class="seg su" id="seg-u" style="width:0%"></div>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="dot" style="background:var(--green)"></div>Paid</div>
+      <div class="li"><div class="dot" style="background:var(--yellow)"></div>Inv. Pending</div>
+      <div class="li"><div class="dot" style="background:var(--red)"></div>Not Invoiced</div>
+    </div>
+  </div>
+
+  <div class="log">
+    <div class="sh">
+      <div style="display:flex;align-items:center">
+        <div class="stitle">Quote Log</div>
+        <div class="ftag" id="ftag" onclick="setFilter('all')">all</div>
       </div>
-      <div class="fg"><label>Status</label>
-        <select id="f-status">
-          <option value="uninvoiced">Not Invoiced</option>
-          <option value="pending">Invoice Pending</option>
-          <option value="paid">Paid</option>
-        </select>
+      <button class="abtn" id="add-btn" onclick="toggleForm()">+ Add Entry</button>
+    </div>
+
+    <div class="form" id="aform">
+      <div class="frow">
+        <div class="fg"><label>Account</label>
+          <select id="f-acct">
+            <option value="maira">@maira4yo ($50)</option>
+            <option value="stfnigg">@stfnigg ($40)</option>
+          </select>
+        </div>
+        <div class="fg"><label>Status</label>
+          <select id="f-status">
+            <option value="uninvoiced">Not Invoiced</option>
+            <option value="pending">Invoice Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Date</label><input type="date" id="f-date"></div>
+        <div class="fg"><label>Note (optional)</label><input type="text" id="f-note" placeholder="e.g. sports market" autocorrect="off" autocapitalize="none"></div>
+      </div>
+      <div class="fbtns">
+        <button class="bsave" onclick="addEntry()">Save Entry</button>
+        <button class="bcancel" onclick="toggleForm()">Cancel</button>
       </div>
     </div>
-    <div class="frow">
-      <div class="fg"><label>Date</label><input type="date" id="f-date"></div>
-      <div class="fg"><label>Note (optional)</label><input type="text" id="f-note" placeholder="e.g. sports market" autocorrect="off" autocapitalize="none"></div>
-    </div>
-    <div class="fbtns">
-      <button class="bsave" onclick="addEntry()">Save Entry</button>
-      <button class="bcancel" onclick="toggleForm()">Cancel</button>
-    </div>
+
+    <div class="elist" id="elist"></div>
+    <div class="empty" id="empty" style="display:none">No entries here.<br>Tap + Add Entry to log a quote.</div>
   </div>
 
-  <div class="elist" id="elist"></div>
-  <div class="empty" id="empty" style="display:none">No entries here.<br>Tap + Add Entry to log a quote.</div>
+  <div class="fnote">@maira4yo $50 &nbsp;·&nbsp; @stfnigg $40 &nbsp;·&nbsp; Payoneer &nbsp;·&nbsp; saved on device</div>
 </div>
-
-<div class="fnote">@maira4yo $50 &nbsp;·&nbsp; @stfnigg $40 &nbsp;·&nbsp; Payoneer &nbsp;·&nbsp; saved on device</div>
 
 <script>
+/* ── Auth ── */
+const CREDS = { username: 'ammar', password: 'ammar5626' };
+let isAdmin = false;
+
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  if (u === CREDS.username && p === CREDS.password) {
+    isAdmin = true;
+    sessionStorage.setItem('kt_auth', 'admin');
+    err.classList.remove('show');
+    showApp();
+  } else {
+    err.classList.add('show');
+    document.getElementById('l-pass').value = '';
+  }
+}
+
+function enterViewOnly() {
+  isAdmin = false;
+  sessionStorage.setItem('kt_auth', 'viewer');
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
+  document.body.classList.add('app-ready');
+  if (!isAdmin) {
+    document.getElementById('vo-banner').classList.add('show');
+    document.getElementById('add-btn').disabled = true;
+  }
+  load();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('kt_auth');
+  isAdmin = false;
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('vo-banner').classList.remove('show');
+  document.getElementById('add-btn').disabled = false;
+  document.body.classList.remove('app-ready');
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+  document.getElementById('login-err').classList.remove('show');
+}
+
+// Allow Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('login-page').classList.contains('hidden')) doLogin();
+});
+
+// Restore session
+(function() {
+  const s = sessionStorage.getItem('kt_auth');
+  if (s === 'admin') { isAdmin = true; showApp(); }
+  else if (s === 'viewer') { isAdmin = false; showApp(); }
+})();
+
+/* ── App data ── */
 const ACCTS = { maira:{handle:'@maira4yo',rate:50}, stfnigg:{handle:'@stfnigg',rate:40} };
-const STATUSES = ['paid','pending','uninvoiced'];
-const SLABELS  = ['Paid','Pending','Not Invoiced'];
+const STATUSES  = ['paid','pending','uninvoiced'];
+const SLABELS   = ['Paid','Pending','Not Invoiced'];
 const THUMB_CLR = { paid:'#00e5a0', pending:'#f5c842', uninvoiced:'#ff5f6d' };
 const VER = 6;
 let entries=[], acct='all', filt='all';
@@ -285,24 +422,16 @@ async function dbSet(k,v){
   catch{return false}
 }
 
-/* ── Seed data ──
-   @maira4yo : 49 total — 33 paid | 11 pending | 5 uninvoiced
-   @stfnigg  : 11 total —  0 paid |  4 pending | 7 uninvoiced
-*/
+/* ── Seed ── */
 function seed(){
   const t=new Date(), fmt=d=>d.toISOString().split('T')[0];
   let id=1000, data=[];
-  const mk=(n,a,st,startOff,step)=>{
-    for(let i=0;i<n;i++){
-      const d=new Date(t); d.setDate(d.getDate()-(startOff+i*step));
-      data.push({id:id++,account:a,date:fmt(d),status:st,note:'Kalshi promo quote'});
-    }
-  };
-  mk(33,'maira',   'paid',       80, 2);
-  mk(11,'maira',   'pending',    12, 2);
-  mk(5, 'maira',   'uninvoiced',  0, 1);
-  mk(4, 'stfnigg', 'pending',     8, 2);
-  mk(7, 'stfnigg', 'uninvoiced',  0, 1);
+  const mk=(n,a,st,off,step)=>{for(let i=0;i<n;i++){const d=new Date(t);d.setDate(d.getDate()-(off+i*step));data.push({id:id++,account:a,date:fmt(d),status:st,note:'Kalshi promo quote'})}};
+  mk(33,'maira',   'paid',       80,2);
+  mk(11,'maira',   'pending',    12,2);
+  mk(5, 'maira',   'uninvoiced',  0,1);
+  mk(4, 'stfnigg', 'pending',     8,2);
+  mk(7, 'stfnigg', 'uninvoiced',  0,1);
   return data;
 }
 
@@ -319,30 +448,17 @@ async function save(){ setSl('saving...'); await dbSet('data',JSON.stringify(ent
 function setSl(t){document.getElementById('slbl').textContent=t}
 
 /* ── State ── */
-function setAcct(a){
-  acct=a; filt='all';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('tab-'+a).classList.add('on');
-  render();
-}
-function setFilter(f){
-  filt=f;
-  const tag=document.getElementById('ftag');
-  tag.style.display=f!=='all'?'inline-block':'none';
-  tag.textContent='× '+f;
-  renderList();
-}
+function setAcct(a){ acct=a; filt='all'; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); document.getElementById('tab-'+a).classList.add('on'); render(); }
+function setFilter(f){ filt=f; const tag=document.getElementById('ftag'); tag.style.display=f!=='all'?'inline-block':'none'; tag.textContent='× '+f; renderList(); }
 function rateOf(a){return ACCTS[a]?.rate??50}
 function acctEntries(){return acct==='all'?entries:entries.filter(e=>e.account===acct)}
 function visible(){return acctEntries().filter(e=>filt==='all'||e.status===filt)}
 function sum(arr){return arr.reduce((s,e)=>s+rateOf(e.account),0)}
 
-/* ── Summary render ── */
+/* ── Summary ── */
 function updateSummary(){
   const ae=acctEntries();
-  const paid=ae.filter(e=>e.status==='paid');
-  const pend=ae.filter(e=>e.status==='pending');
-  const uninv=ae.filter(e=>e.status==='uninvoiced');
+  const paid=ae.filter(e=>e.status==='paid'), pend=ae.filter(e=>e.status==='pending'), uninv=ae.filter(e=>e.status==='uninvoiced');
   const paidAmt=sum(paid),pendAmt=sum(pend),uninvAmt=sum(uninv),totAmt=sum(ae);
   document.getElementById('b-earned').textContent='$'+paidAmt;
   document.getElementById('b-note').textContent=ae.length+' quotes · $'+totAmt+' total value';
@@ -363,10 +479,9 @@ function updateSummary(){
 }
 function render(){ updateSummary(); renderList(); }
 
-/* ── Entry list render ── */
+/* ── Entry list ── */
 function renderList(){
-  const list=document.getElementById('elist');
-  const empty=document.getElementById('empty');
+  const list=document.getElementById('elist'), empty=document.getElementById('empty');
   const sorted=visible().sort((a,b)=>b.date.localeCompare(a.date));
   const tag=document.getElementById('ftag');
   tag.style.display=filt!=='all'?'inline-block':'none';
@@ -375,6 +490,7 @@ function renderList(){
   empty.style.display='none';
   list.innerHTML=sorted.map((e,i)=>{
     const isM=e.account==='maira';
+    const locked=!isAdmin;
     return `
     <div class="entry ${isM?'am':'as'}" id="entry-${e.id}" style="animation-delay:${i*.025}s">
       <div class="etop">
@@ -385,13 +501,13 @@ function renderList(){
         </div>
         <div class="eright">
           <span class="eamt ${e.status}" id="amt-${e.id}">$${rateOf(e.account)}</span>
-          <button class="dbtn" onclick="del(${e.id})">del</button>
+          ${isAdmin?`<button class="dbtn" onclick="del(${e.id})">del</button>`:''}
         </div>
       </div>
-      <div class="sslider" id="sl-${e.id}">
+      <div class="sslider ${locked?'locked':''}" id="sl-${e.id}">
         <div class="sslider-thumb" id="thumb-${e.id}"></div>
         <div class="sslider-opts">
-          ${STATUSES.map((s,si)=>`<div class="sopt" id="opt-${e.id}-${s}" onclick="changeStatus(${e.id},'${s}')">${SLABELS[si]}</div>`).join('')}
+          ${STATUSES.map((s,si)=>`<div class="sopt" id="opt-${e.id}-${s}" ${!locked?`onclick="changeStatus(${e.id},'${s}')"`:''}>${SLABELS[si]}</div>`).join('')}
         </div>
       </div>
     </div>`;
@@ -409,13 +525,11 @@ function positionThumb(id,status){
   thumb.style.left=(optR.left-slR.left)+'px';
   thumb.style.width=optR.width+'px';
   thumb.style.background=THUMB_CLR[status];
-  STATUSES.forEach(s=>{
-    const o=document.getElementById('opt-'+id+'-'+s);
-    if(o){ o.className='sopt'; if(s===status)o.classList.add('act-'+s); }
-  });
+  STATUSES.forEach(s=>{const o=document.getElementById('opt-'+id+'-'+s);if(o){o.className='sopt';if(s===status)o.classList.add('act-'+s)}});
 }
 
 async function changeStatus(id,newStatus){
+  if(!isAdmin){toast('Sign in to edit','err');return}
   const entry=entries.find(e=>e.id===id);
   if(!entry||entry.status===newStatus)return;
   entry.status=newStatus;
@@ -429,6 +543,7 @@ async function changeStatus(id,newStatus){
 
 /* ── Form ── */
 function toggleForm(){
+  if(!isAdmin){toast('Sign in to edit','err');return}
   const f=document.getElementById('aform');
   const opening=!f.classList.contains('open');
   f.classList.toggle('open');
@@ -440,6 +555,7 @@ function toggleForm(){
   }
 }
 async function addEntry(){
+  if(!isAdmin)return;
   const account=document.getElementById('f-acct').value;
   const date=document.getElementById('f-date').value;
   const status=document.getElementById('f-status').value;
@@ -450,6 +566,7 @@ async function addEntry(){
   await save(); toast('Saved ✓','ok');
 }
 async function del(id){
+  if(!isAdmin)return;
   if(!confirm('Remove this entry?'))return;
   entries=entries.filter(e=>e.id!==id);
   render(); await save(); toast('Removed','');
@@ -462,12 +579,8 @@ function toast(msg,type=''){
   clearTimeout(t._t); t._t=setTimeout(()=>t.className=type,2200);
 }
 
-/* ── Service Worker registration ── */
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
-
-load();
+/* ── Service Worker ── */
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
